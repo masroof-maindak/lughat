@@ -36,7 +36,7 @@ fn print_help() {
 }
 
 fn prompt() -> String {
-    print!("sahifa> ");
+    print!("lughat> ");
     io::stdout().flush().unwrap();
     let mut input = String::new();
 
@@ -61,12 +61,13 @@ fn gemini_contextless_mode(
             return Ok(());
         }
 
-        if input.starts_with("/") {
+        if input.starts_with(".") {
             let first_word = input.split_whitespace().next().unwrap();
 
             match first_word {
-                "/bye" => return Ok(()),
-                "/help" => print_help(),
+                ".bye" => return Ok(()),
+                ".help" => print_help(),
+                ".exit" => return Ok(()),
                 _ => print_help(),
             }
 
@@ -114,6 +115,7 @@ fn main() -> anyhow::Result<()> {
     let gemini_key = get_api_key()?;
 
     println!("{}", consts::ASCII_ART);
+    println!("Welcome to Lughat.\nEnter \".help\" for usage hints.");
     println!();
 
     let _ = gemini_contextless_mode(&client, &gemini_key);
