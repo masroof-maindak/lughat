@@ -15,5 +15,17 @@ curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:s
 
 */
 
+pub const DEFAULT_CACHE_DIR: &str = ".cache/";
+
+pub const ASCII_ART: &str = "
+(\\
+\\'\\
+ \\'\\     __________
+ / '|   ()_________)
+ \\ '/    \\ ~~~~~~~~ \\
+   \\       \\ ~~~~~~   \\
+   ==).      \\__________\\
+  (__)       ()__________)";
+
 pub const TEXT_TO_TEXT_API_URL: &str =
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";

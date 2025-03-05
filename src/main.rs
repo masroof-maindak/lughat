@@ -1,7 +1,9 @@
-use dotenv::dotenv;
+use anyhow::anyhow;
 use reqwest;
+use std::fs::create_dir_all;
 use std::io;
 use std::io::Write;
+use std::path::PathBuf;
 
 mod consts;
 mod json;
@@ -76,12 +78,43 @@ fn gemini_contextless_mode(
     }
 }
 
-fn main() -> Result<(), reqwest::Error> {
-    dotenv().ok();
-    let client = reqwest::blocking::Client::new();
+pub fn get_cache_dir_path() -> anyhow::Result<PathBuf> {
+    if let Ok(cache_home) = std::env::var("XDG_CACHE_HOME") {
+        return Ok(PathBuf::from(cache_home).join("lughat"));
+    }
 
-    // TODO: get this from config file instead
-    let gemini_key = std::env::var("GEMINI_API_KEY").expect("GEMINI_API_KEY must be set");
+    let mut home: PathBuf;
+
+    match dirs_next::home_dir() {
+        Some(path) => home = path,
+        None => return Err(anyhow!("Failed to get home directory")),
+    }
+
+    home.push(consts::DEFAULT_CACHE_DIR);
+    Ok(home.join("lughat"))
+}
+
+fn get_api_key() -> anyhow::Result<String> {
+    let mut cache_home = get_cache_dir_path()?;
+
+    create_dir_all(&cache_home)?;
+
+    cache_home.push("gemini-api-key");
+
+    let key = match std::fs::read_to_string(&cache_home) {
+        Ok(k) => k,
+        Err(e) => return Err(anyhow!("Failed to read file {:?}: {}", cache_home, e)),
+    };
+
+    Ok(key)
+}
+
+fn main() -> anyhow::Result<()> {
+    let client = reqwest::blocking::Client::new();
+    let gemini_key = get_api_key()?;
+
+    println!("{}", consts::ASCII_ART);
+    println!();
 
     let _ = gemini_contextless_mode(&client, &gemini_key);
 
