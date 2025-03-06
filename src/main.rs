@@ -10,7 +10,7 @@ mod json;
 
 fn gemini_contextless_message(
     client: &reqwest::blocking::Client,
-    api_key: &String,
+    api_key: &str,
     input: String,
 ) -> Result<String, reqwest::Error> {
     let json_data = json::GeminiJsonRoot {
@@ -49,7 +49,7 @@ fn prompt() -> String {
 
 fn gemini_contextless_mode(
     client: &reqwest::blocking::Client,
-    api_key: &String,
+    api_key: &str,
 ) -> Result<(), reqwest::Error> {
     loop {
         let input = prompt();
@@ -84,12 +84,10 @@ pub fn get_cache_dir_path() -> anyhow::Result<PathBuf> {
         return Ok(PathBuf::from(cache_home).join("lughat"));
     }
 
-    let mut home: PathBuf;
-
-    match dirs_next::home_dir() {
-        Some(path) => home = path,
+    let mut home: PathBuf = match dirs_next::home_dir() {
+        Some(path) => path,
         None => return Err(anyhow!("Failed to get home directory")),
-    }
+    };
 
     home.push(consts::DEFAULT_CACHE_DIR);
     Ok(home.join("lughat"))
